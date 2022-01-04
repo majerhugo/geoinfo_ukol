@@ -1,1 +1,0 @@
-# geoinfo_ukol
