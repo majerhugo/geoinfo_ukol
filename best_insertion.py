@@ -1,16 +1,16 @@
 import math, random
 from matplotlib import pyplot
 
-#definovanie funkcie pre import suradnic z textaku
+#creating function for getting coordinates from text file
 def get_coord(input_file):
 
-    #zoznam pre suradnice
+    #list for coordinates
     coord=[]
     
     with open(input_file) as f:
         lines=f.readlines()
         
-        #zaciatok prveho riadku v textaku je nejaky vadny...
+        #the beginning of text file´s first row is corrupted...
         lines[0]=lines[0][3:len(lines[0])]    
 
         for line in lines:
@@ -21,102 +21,102 @@ def get_coord(input_file):
             coord.append(line)
     return coord
 
-#definovanie funkcie b_i, parametrom je vstupny dataset
+#creating function for b_i method, the parameter is the dataset containing coordinates
 def best_insertion(input):
 
-    #dlzku Hamiltonovskej kruznice inicializujem ako 0
+    #initializing the length of Hamilton cyrcle as 0
     w=0
 
-    #list pre cestu
+    #list for the path
     path=[]
 
-    #list indexov vsetkych uzlov
+    #list of indices of all nodes indexov vsetkych uzlov
     l_ind = list(range(len(coord)-1))
 
-    #kruznicu inicializujem 3 uzlami
+    #initializing the cyrcle by 3 nodes
     for i in range(3):
     
-        #nahodny vyber z listu idexov
+        #random choice from list of indices
         u=random.choice(l_ind)
 
-        #vybrany index zmazat
+        #the chosen one delete from the list of indices
         l_ind.remove(u)
 
-        #pridat ho do cesty
+        #add it to the path
         path.append(u)
 
-        #po druhej iteracii cyklu uz mam v zozname dva uzly, mozem pocitat vzdialenost
+        #after second iteration there are 2 nodes in path, calculating the distance between them is possible
         if i > 0:
             w_k = math.sqrt((coord[path[i]][0] - coord[path[i-1]][0])**2 + (coord[path[i]][1] - coord[path[i -1]][1])**2)
 
-            #pridavam ju do w
+            #updating w
             w = w + w_k
 
-    #do zoznamu cesty pridam znova startovny uzol, aby som dostal, resp. uzavrel kruznicu
+    #adding the starting node to the path again to create a cyrcle
     path.append(path[0])
 
-    #pocitam vzdialenost medzi startovnym (resp. koncovym) uzlom a poslednym uzlom v ceste
+    #update the length of the cyrcle by adding distance between the last node of the path and the starting one
     w = w + math.sqrt((coord[path[0]][0] - coord[path[-2]][0])**2 + (coord[path[0]][1] - coord[path[-2]][1])**2)
 
-    #kym v zozname indexov nieco zostava
+    #while the list of indices is not empty
     while len(l_ind) > 0:
 
-        #pomocna premenna do ktorej budem ukladat najkratsie prirastky dlzky kruznice
+        #variable, where the shortest increase of cyrcle´s length will be stored, initialized as Inf
         w_min=float("inf")
 
-        #miesto vlozenia do cesty
+        #position of insertion to the path
         index=-1
 
-        #vyberam nahodne z listu vsetkych uzlov
+        #random choice from the list of indices
         u=random.choice(l_ind)
 
-        #ukladam suradnice vybraneho uzlu
+        #storing the coordinates of the chosen node
         x = coord[u][0]
         y = coord[u][1]
 
-        #pocitanie vzdialenosti aby som vedel kam vkladat vybrany uzol
+        #calculating the distances to determine the insertion position of the chosen node
         for i in range(len(path)-1):
 
-            #vzdialenost medzi vybranym uzlom a i-tym uzlom
+            #distance between the chosen node and i node
             w_k1 = math.sqrt((x - coord[path[i]][0])**2 + (y - coord[path[i]][1])**2)
 
-            #vzdialenost medzi vybranym uzlom a (i-tym + 1) uzlom, pretoze uzol budem vkladat medzi 2 uzly
+            #distance betweeen the chosen node and i+1 node, because the node will be inserted between 2 nodes
             w_k2 = math.sqrt((x - coord[path[i + 1]][0])**2 + (y - coord[path[i + 1]][1])**2)
 
-            #vzdialenost medzi i-tym a (i-tym + 1) uzlom
+            #distance between i node and i+1 node
             w_k3 = math.sqrt((coord[path[i]][0] - coord[path[i + 1]][0])**2 + (coord[path[i]][1] - coord[path[i + 1]][1])**2)
 
-            #trojuholnikova nerovnost
+            #triangle inequality
             w_k4 = w_k1 + w_k2 - w_k3
 
-            #ak je prirastok mensi 
+            #if the increase is smaller 
             if w_k4 < w_min:
 
-                #prepisem w_min
+                #overwrite w_min
                 w_min=w_k4
 
-                #pozicia vlozenia do cesty
+                #position of insertion to the path
                 index=i+1
     
-        #k dlzke kruznice pridam danu vzdialenost
+        #adding the given distance to the cyrcle length
         w=w+w_min
 
-        #do cesty na dane miesto vlozim ten (nahodne) vybrany uzol 
+        #inserting the node to the path to the given position 
         path.insert(index, u)
 
-        #odstranim vybrany uzol zo zoznamu vsetkych uzlov
+        #removing the chosen node from the list of indices
         l_ind.remove(u)
 
-    #vizualizacia
+    #visualization
 
-    #cesta
+    #path
     x = []
     y = []
     for p in path:
         x.append(coord[p][0])
         y.append(coord[p][1])
 
-    #uzly
+    #nodes
     x_uzly = []
     y_uzly = []
     for c in coord:
@@ -132,8 +132,8 @@ def best_insertion(input):
 #input_file = "C:\\SKOLA\\GEOINFO\\grafove_algoritmy\\ukol\\data\\peaks_male_karpaty.txt"
 input_file="C:\\SKOLA\\GEOINFO\\grafove_algoritmy\\ukol\\data\\ba_bary.txt"
 
-#zavolanie funkcie na ziskanie suradnic
+#calling function for get_coord
 coord=get_coord(input_file)
 
-#zavolanie funkcie b_i a vypisanie dlzky kruznice
+#calling function b_i and printing the length of Hamilton cyrcle
 print(best_insertion(coord))

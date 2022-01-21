@@ -1,16 +1,16 @@
 import math
 from matplotlib import pyplot
 
-#definopvanie funkcie pre import suradnic z textaku
+#creating function for getting coordinates from text file
 def get_coord(input_file):
 
-    #zoznam pre suradnice
+    #list for coordinates
     coord=[]
     
     with open(input_file) as f:
         lines=f.readlines()
         
-        #zaciatok prveho riadku v textaku je nejaky vadny...
+        #the beginning of text file´s first row is corrupted...
         lines[0]=lines[0][3:len(lines[0])]    
 
         for line in lines:
@@ -21,71 +21,71 @@ def get_coord(input_file):
             coord.append(line)
     return coord
 
-#definovanie funkcie n_n, parametrom je vstupny dataset
+#creating function for n_n method, parameter is the dataset containing coordinates
 def nearest_neighbor (input):
 
-    #stav vsetkych uzlov inicializujem ako nespracovane (new) 
+    #initializing status of all nodes as New 
     s=["N"]*(len(coord))
 
-    #dlzku Hamiltonovskej kruznice inicializujem ako 0
+    #initializing the length of Hamilton cyrcle as 0
     w=0
 
-    #index prveho uzlu
+    #index of the first node
     start=0
 
-    #zacinam prvym uzlom, oznacim ho ako closed
+    #starting with first node, labelling it as Closed
     s[0]="C"
 
-    #tvorim cestu, zacinam prvym uzlom (s indexom 0)
+    #creating the path, starting with first node
     path=[start]
 
-    #pokym existuje nespracovany uzol v zozname s
+    #while exists node with status New in list s 
     while "N" in s:
 
-        #pomocna premenna do ktorej budem ukladat najkratsie vzdialenosti nasledujuceho uzlu kruznice, inicializujem nekonecnom
+        #variable, where the shortest distances of the following (next) node of path will be stored, initialized as Inf 
         min_w=float("inf")
     
-        #index najblizsieho uzlu
+        #index of the closest node
         u=-1
 
-        #prechadzame uzol po uzle, od 1 lebo 0 je startovny
+        #going through node after node, from 1 because 0 is the starting one
         for i in range(1, len(coord)):
 
-            #pokial dany uzol je nespracovany
+            #if the given node has status New
             if s[i] == "N":
 
-                #pocitanie vzdialenosti medzi poslednym (aktualnym) uzlom tvoriacim kruznicu a urcitym i-tym uzlom
+                #calculating the distance between the last node of cyrcle and the i node
                 w_i = math.sqrt((coord[i][0] - coord[path[-1]][0])**2 + (coord[i][1] - coord[path[-1]][1])**2)
 
-                #ak ich vzdialenosti je mensia ako ta minimalna, prepisem min_w a poznamenam si index daneho bodu
+                #if the distance is shorter than the minimal, rewrite min_w and note the index of given node
                 if w_i < min_w:
                     min_w=w_i
                     u=i
     
-        #do cesty pridam najblizsi uzol     
+        #add the closest node to the path     
         path.append(u)
 
-        #pridany uzol oznacim ako closed
+        #give status Closed to the added node
         s[u]="C"
 
-        #k dlzke kruznice pridam danu vzdialenost
+        #update the length of the patrh (cyrcle)
         w = w + min_w
 
-    #do zoznamu cesty pridam znova startovny uzol, aby som dostal, resp. uzavrel kruznicu
+    #adding the starting node to the path again to get cyrcle
     path.append(path[0])
 
-    #pripocitam vzdialenost medzi startovnym (a koncovym) uzlom kruznice a poslednym uzlom v ceste
+    #update the length of the cyrcle by adding distance between the last node of the path and the starting one
     w = w + math.sqrt((coord[0][0] - coord[path[-2]][0])**2 + (coord[0][1] - coord[path[-2]][1])**2)
 
-    #vizualizacia
-    #cesta
+    #visualization
+    #path
     x = []
     y = []
     for p in path:
         x.append(coord[p][0])
         y.append(coord[p][1])
 
-    #uzly
+    #nodes
     x_uzly = []
     y_uzly = []
     for c in coord:
@@ -102,8 +102,8 @@ def nearest_neighbor (input):
 #input_file="C:\\SKOLA\\GEOINFO\\grafove_algoritmy\\ukol\\data\\peaks_male_karpaty.txt"
 input_file="C:\\SKOLA\\GEOINFO\\grafove_algoritmy\\ukol\\data\\ba_bary.txt"
 
-#zavolanie funkcie na ziskanie suradnic
+#calling function for get_coord
 coord=get_coord(input_file)
 
-#zavolanie funkcie n_n a vypisanie dlzky kruznice
+#calling function n_n and printing the length of Hamilton cyrcle
 print(nearest_neighbor(coord))
